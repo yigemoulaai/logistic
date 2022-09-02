@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="layui/css/layui.css" />
+    <script src="js/jquery/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="layer/layer.js"></script>
+    <script type="text/javascript" src="layui/layui.all.js"></script>
+    <script src="js/nginx.js"></script>
+</head>
+
+<body>
+<div class='login' >
+    <form class="layui-form" action="" id="registerForm">
+    <div class="layui-form-item" >
+        <label class="layui-form-label">注册账号</label>
+        <div class="layui-input-inline">
+            <input type="text" id="username" name="username" required lay-verify="required" placeholder="请输入账号" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">登录密码</label>
+        <div class="layui-input-inline">
+            <input type="password" id="password" name="password" required lay-verify="password" placeholder="请设置密码" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">输入手机号</label>
+        <div class="layui-input-inline" >
+            <input type="text" name="phone" required lay-verify="phone" placeholder="请输入手机号" autocomplete="off" class="layui-input" id="phone">
+            <button type="button" id="getVdCode"  class="layui-btn layui-btn-fluid" >发送验证码</button>
+        </div>
+        <label class="layui-form-label">验证码</label>
+        <div class="layui-input-inline">
+            <input type="text" name="vertifyCode"  id="vertifyCode"  placeholder="请输入验证码" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户类型</label>
+        <select name="userType" id="userType" lay-filter="userType" style="width: 150px;display: inline-block;">
+            <option value="司机">司机</option>
+            <option value="客户">客户</option>
+        </select>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="truename" required lay-verify="truename" placeholder="请输入您的姓名" autocomplete="off" class="layui-input">
+        </div>
+        <label class="layui-form-label wd-100">居住地址</label>
+        <div class="layui-input-inline">
+            <input type="text" id="address" name="address" lay-verify="address" placeholder="请输入接收人姓名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮箱</label>
+        <div class="layui-input-inline">
+            <input type="text" name="emails" required lay-verify="emails" placeholder="请输入商用邮箱" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class='login_fields__submit' align="center">
+            <div class="layui-input-block">
+                <!--<input type='button' value='登录'>-->
+                <button class="layui-btn" lay-submit lay-filter="addUser" id="addUser">注册</button>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+<script>
+    layui.use(['element', 'form', 'laydate', 'layer','layedit', 'table','jquery','util'], function(){
+        let element = layui.element,
+            form = layui.form,
+            laydate = layui.laydate,
+            layedit=layui.layedit,
+            layer = layui.layer,
+            $ = layui.jquery,
+            table = layui.table;
+        form.on('submit(addUser)', function () {
+            let index = layer.load();
+            $.ajax({
+                type: 'post',
+                url: nginx_url + '/addUser',
+                data: $("#registerForm").serialize(),
+                dataType: 'json',
+                async: false,
+                success:function(msg) {
+                    if (msg.STATUS === 'SUCCESS') {//根据返回值进行跳转
+                        alert("注册成功")
+                        window.location.href = "../logi n.html";
+                        window.location.href="www.baidu.com";
+                    }
+                    else {
+                        alert("注册失败")
+                    }
+                }
+            });
+        });
+        $(document).on('click','#getVdCode',function(){
+            var phone = $('#phone').val();
+            if (!phone.match(/^0?(13[0-9]|14[5-9]|15[012356789]|166|17[0-8]|18[0-9]|19[8-9])[0-9]{8}$/)) {
+                alert('请填写正确的手机号码！');
+            } else {
+                $.ajax({
+                    type: "get",
+                    url: nginx_url + '/sendCode',
+                    data: {
+                        phone: phone
+                    },
+                    dataType: "json",
+                    success: function(data) {
+                        if (data.STATUS === "SUCCESS") {
+                            alert('验证码已成功发送，请及时查收！');
+                            timefsyzm_old();
+                        } else {
+                            alert('获取验证码失败，请稍后重试！');
+                        }
+                    }
+                });
+            }
+        })
+
+        form.on('submit(sendCode)', function () {
+            let index = layer.load();
+            $.ajax({
+                type: 'get',
+                url: nginx_url + '/sendCode',
+                data: {
+                    'phone': $('#phone').val(),
+                },
+                dataType: 'json',
+                async: false,
+                success:function(msg) {
+                    if (msg.STATUS === 'SUCCESS') {//根据返回值进行跳转
+                        alert("验证码成功")
+
+                    }
+                    else {
+                        alert("验证码发送失败")
+                    }
+                }
+            });
+        });
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+        //自定义验证规则
+        form.verify({
+            title: function(value) {
+                if(value.length < 5) {
+                    return '标题至少得5个字符啊';
+                }
+            },
+            pwd: [
+                /^(\w){6,20}$/, '只能输入6-20个字母、数字、下划线'
+            ],
+            emails: [
+                /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/, '请输入正确的邮箱格式：<br>如：xxx@qq.com<br>xxx@163.com等格式'
+            ],
+            phones: [
+                /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/, '您的输入有误，请重新输入(中国11位手机号)'
+            ],
+            truename: [
+                /^[\u4e00-\u9fa5]{2,4}$/, '您的输入有误，请输入2-4位中文'
+            ],
+            cardId: [
+                /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, '请输入正确的身份证号'
+            ],
+            content: function(value) {
+                layedit.sync(editIndex);
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+</head>
+<body>
+<div class="layui-tab-item layui-show">
+    <form class="layui-form" action="" id="cusOrdDetailForm">
+        <div class="layui-form-item">
+            <label class="layui-form-label">发货人</label>
+            <div class="layui-input-inline">
+                <input   type="text" id="customerId"  name="customerId" lay-verify="required" placeholder="请输入发货人姓名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label ">收货人电话</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="receiverPhone" name="receiverPhone" lay-verify="required|phone" placeholder="请输入电话" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label wd-100">发货仓</label>
+                <div class="layui-input-inline" >
+                    <select  id="goodsStartSite" name="goodsStartSite" lay-verify="required" lay-search>
+                        <option value="">请选择发货仓</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label wd-100">接货仓</label>
+                <div class="layui-input-inline">
+                    <select id="goodsOrderSite" name="goodsOrderSite" lay-verify="required" lay-search>
+                        <option value="">请选择接货仓</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label ">起运时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="goodsStartTime" name="goodsStartTime" id="goodsStartTime" class="layui-input test-item"/>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">货物类型</label>
+                <div class="layui-input-inline">
+                    <select id="goodsType" name="goodsType" lay-verify="required" lay-search>
+                        <option value="">请选择货物类型</option>
+                    <option value="食品">食品</option>
+                    <option value="日用品">日用品</option>
+                    <option value="生鲜">生鲜</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">货物载重</label>
+                <div class="layui-input-inline">
+                    <input type="text"  id="goodsSize" name="goodsSize" lay-verify="required" placeholder="请输入货物载重" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+            <label class="layui-form-label">ID</label>
+            <div class="layui-input-inline">
+                <input type="text"  id="id" name="id" lay-verify="required" readonly placeholder="" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">货物状态</label>
+                <div class="layui-input-inline">
+                    <input type="text"  id="status" name="status" lay-verify="required" readonly placeholder="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="updateCargoSend" id="updateCargoSend">立即提交</button>
+                <button type="reset" id="resetForm1" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+</body>
+<script src="../../../layui/layui.js"></script>
+<script src="../../../js/jquery/jquery-3.3.1.js"></script>
+<script src="../../../js/jquery/jquery.cookie.js"></script>
+<script src="../../../js/nginx.js"></script>
+<script src="../../../js/appControl/customer/cusOrderDetail.js"></script>
+</html>

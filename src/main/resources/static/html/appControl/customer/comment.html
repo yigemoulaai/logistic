@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>评分组件</title>
+    <link rel="stylesheet" href="../../../layui/css/layui.css">
+</head>
+<body>
+<div class="layui-form-item" style="margin-top: 10px">
+    <form class="layui-form" action="" id="commentForm">
+        <div class="layui-form-item">
+            <label class="layui-form-label">物流服务</label>
+            <div id="logService" name="logService"></div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">服务态度</label>
+                <div id="serviceAtt" name="serviceAtt"></div>
+            </div>
+        </div>
+        <button type="button" class="layui-btn layui-btn-radius" lay-submit lay-filter="submitComment" id="submitComment">提交评价</button>
+        <!--</div>-->
+        <!--</div>-->
+    </form>
+</div>
+<script src="../../../layui/layui.js"></script>
+<script src="../../../js/jquery/jquery-3.3.1.js"></script>
+<script src="../../../js/jquery/jquery.cookie.js"></script>
+<script src="../../../js/nginx.js"></script>
+<script>
+
+    layui.use(['rate','form', 'laydate', 'jquery', 'layer'], function(){
+        let rate = layui.rate,
+        form = layui.form,
+            $ = layui.jquery;
+        //渲染
+        var ins1 = rate.render({
+            elem: '#logService'  //绑定元素
+            ,setText: function(value){
+                var arrs = {
+                    '1': '极差'
+                    ,'2': '差'
+                    ,'3': '中等'
+                    ,'4': '好'
+                };
+                this.span.text(arrs[value] || ( value + "星"));
+            }
+        });
+        var ins2 = rate.render({
+            elem: '#serviceAtt'  //绑定元素
+        });
+        let goodsCode = window.location.href.split("=")[1];
+        form.on('submit(submitComment)', function () {
+            $.ajax({
+                type: "post",
+                url: nginx_url + "/goodsInfo/comment/"+goodsCode,
+                data:  $("#commentForm").serialize(),
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    if (result.STATUS === "SUCCESS") {
+                        layer.msg('订单评价成功', {
+                            time: 800,
+                            icon: 1
+                        });
+                    } else {
+                        layer.msg('系统故障，评价失败', {
+                            time: 800,
+                            icon: 2
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+
+</script>
+</body>
+</html>

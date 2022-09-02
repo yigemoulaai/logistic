@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <title>客户管理页面</title>
+    <link rel="stylesheet" href="../../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+</head>
+<body>
+    <script src="../../../layui/layui.js"></script>
+    <script src="../../../js/jquery/jquery-3.3.1.js"></script>
+    <script src="../../../js/jquery/jquery.cookie.js"></script>
+    <script src="../../../js/nginx.js"></script>
+    <script src="../../../js/appControl/customer/customerManage.js"></script>
+    <script>
+        function Logout() {
+            $.cookie("loginId", null);
+            document.cookie = 'loginId=;expires=Thu, 01-Jan-1970 00:00:01 GMT';
+            window.location.href = "../../../login.html";
+        }
+    </script>
+    <ul class="layui-nav ">
+        <li class="layui-nav-item">
+            <a href="">控制台<span class="layui-badge">9</span></a>
+        </li>
+        <li class="layui-nav-item">
+            <a href="">个人中心<span class="layui-badge-dot"></span></a>
+        </li>
+        <li class="layui-nav-item">
+            <a href=""><img src="//t.cn/RCzsdCq" class="layui-nav-img">我</a>
+            <dl class="layui-nav-child">
+                <dd><a href="../../appControl/driver/driverInfoDetail.html">修改信息</a></dd>
+                <dd><a href="javascript:;">安全管理</a></dd>
+                <dd><a href="javascript:;" onclick="Logout()">退出登录</a></dd>
+            </dl>
+        </li>
+    </ul>
+    <div class="layui-tab layui-tab-brief" lay-filter="demo">
+        <ul class="layui-tab-title">
+            <li class="layui-this">我要发单</li>
+            <li>我的发单记录</li>
+            <li>客户信息</li>
+            <li>订单评价</li>
+        </ul>
+        <div class="layui-tab-content" style="height: 100px; display: block">
+            <div class="layui-tab-item layui-show">
+                <form class="layui-form" action="" id="cusOrdForm">
+                    <div class="layui-form-item" >
+                        <label class="layui-form-label">发货人</label>
+                        <div class="layui-input-inline">
+                            <input   type="text" readonly id="customerId"  name="customerId"  placeholder="请输入发货人姓名" autocomplete="off" class="layui-input">
+                        </div>
+                        <label class="layui-form-label wd-100">接收人</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="receiverId" lay-verify="required" placeholder="请输入接收人姓名" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label ">电话</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="receiverPhone" lay-verify="required|phone" placeholder="请输入电话" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label wd-100">发货仓</label>
+                        <div class="layui-input-inline">
+                        <select id="goodsStartSite" name="goodsStartSite" lay-verify="required" lay-search>
+                            <option value="">请选择发货仓</option>
+                        </select>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="layui-form-item">
+                    <div class="layui-inline">
+                            <label class="layui-form-label wd-100">接货仓</label>
+                        <div class="layui-input-inline">
+                        <select id="goodsOrderSite" name="goodsOrderSite" lay-verify="required" lay-search>
+                            <option value="">请选择接货仓</option>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label ">起运时间</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="goodsStartTime" id="goodsStartTime" class="layui-input test-item"/>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">货物类型</label>
+                            <div class="layui-input-inline">
+                            <select id="goodsType" name="goodsType" lay-verify="required" lay-search>
+                                <option value="">请选择货物类型</option>
+                                <option value="食品">食品</option>
+                                <option value="日用品">日用品</option>
+                                <option value="生鲜">生鲜</option>
+                            </select>
+                        </div>
+                        </div>
+                        <div class="layui-inline">
+                        <label class="layui-form-label">货物载重</label>
+                            <div class="layui-input-inline">
+                            <input type="text" name="goodsSize" lay-verify="required" placeholder="请输入货物载重" autocomplete="off" class="layui-input">
+                        </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <!--<button class="layui-btn"    onclick="compute"  lay-filter="computeFee" id="computeFee">计算运费</button>-->
+                            <button class="layui-btn" lay-submit lay-filter="addCargoSend" id="addCargoSend">立即提交</button>
+                            <button type="reset" id="resetForm1" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="layui-tab-item">
+                <table id="cusOrderTable" lay-filter="cusOrderTool"></table>
+                <script type="text/html" id="barDemo1">
+                    <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="detail">查看详情</a>
+                    <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" data-method="offset" lay-event="confrimGet">确认收货</a>
+                </script>
+            </div>
+            <div class="layui-tab-item ">
+                <div class="layui-form-item">
+                <form class="layui-form" action="" id="cusForm">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">客户姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" readonly name="customerCode" id="customerCode" lay-verify="required" placeholder="请输入客户姓名" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="customer" readonly id="customer"  placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">传真</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="fax" id="fax" lay-verify="required|fax" placeholder="请输入传真" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">邮编</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="postCode" id="postCode" lay-verify="required|postcode" placeholder="请输入邮编" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">地址</label>
+                            <div class="layui-input-block" style="width: 514px">
+                                <input type="text" name="address" id="address" lay-verify="required" placeholder="请输入地址" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">联系人</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="linkman" id="linkman" lay-verify="required" placeholder="请输入联系人" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">联系人手机</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="linkmanMobile" id="linkmanMobile"  lay-verify="required|phone" placeholder="请输入联系人手机" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">客户类型</label>
+                            <div class="layui-input-inline">
+                                <input type="text" readonly name="customerType" id="customerType" lay-verify="required" placeholder="请输入客户类型" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">企业性质</label>
+                            <div class="layui-input-inline">
+                                <input type="text" readonly name="enterpriseProperty" id="enterpriseProperty"  lay-verify="required" placeholder="请输入企业性质" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">企业规模</label>
+                            <div class="layui-input-inline">
+                                <input type="text" readonly name="enterpriseSize" id="enterpriseSize" lay-verify="required" placeholder="请输入企业规模" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">电子邮件</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="email" id="email" lay-verify="required|email" placeholder="请输入电子邮件" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="button" class="layui-btn" lay-submit lay-filter="updateCus" id="updateCus">更新信息</button>
+                            <button type="reset" id="resetForm" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <table id="cusCommentTable" lay-filter="cusCommentTool"></table>
+                <script type="text/html" id="barDemo">
+
+                    <a class="layui-btn layui-btn-xs" lay-event="detail">评价</a>
+
+                </script>
+                <script type="text/html" id="indexTpl">
+                    {{ d.LAY_TABLE_INDEX+1 }}
+                </script>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

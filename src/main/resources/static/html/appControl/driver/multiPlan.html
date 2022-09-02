@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>请求多城市规划</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+</head>
+<body>
+<div class="layui-tab layui-tab-brief" lay-filter="demo">
+    <ul class="layui-tab-title">
+        <li class="layui-this">请求配送规划</li>
+    </ul>
+<div class="layui-tab-item layui-show">
+    <form class="layui-form" action="" id="SchedulingForm">
+        <div class="layui-form-item">
+            <label  style="width:150%">请填写以下信息,填写必要的仓库地理信息（点击左上角可显示仓库信息）</label>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">起始仓</label>
+            <div class="layui-input-inline">
+                <input   type="text" id="beginMarker"  name="customerId" lay-verify="required" style="width:150%" placeholder="请输入你要出发的仓（填写地理位置）" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">经过仓</label>
+            <div class="layui-input-block">
+                <textarea id="passMarker" name="passMarker" placeholder="请输入你要经过的仓（请严格按照下列仓的地理位置填写，多个仓请用逗号“/”隔开）" type="text/plain" style="width:60%;height:50px"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="queryScheduling" id="queryScheduling">提交查询调度</button>
+                <button type="reset" id="resetForm1" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+    <table id="markerTable" lay-filter="markerTool" lay-size="200px" lay-data="{id:'markerTable'}"></table>
+</div>
+
+
+</div>
+<script src="../../../layui/layui.js"></script>
+<script src="../../../js/jquery/jquery-3.3.1.js"></script>
+<script src="../../../js/jquery/jquery.cookie.js"></script>
+<script src="../../../js/nginx.js"></script>
+
+<script type="text/javascript">
+    //全局定义一次, 加载formSelects
+
+    //加载模块
+    layui.use(['element', 'form', 'laydate', 'layer', 'table','jquery','util'], function(){
+        let element = layui.element,
+            form = layui.form,
+            laydate = layui.laydate,
+            layer = layui.layer,
+            $ = layui.jquery,
+            table = layui.table;
+        element.on('tab(demo)', function(data){
+            if (data.index === 0) {
+                table.render({
+                    elem: '#markerTable',
+                    height: 'full-170',
+                    url: nginx_url + '/marker/selectAllMarker', //数据接口
+                    limit: 10,
+                    limits: [ 10 ],
+                    request: {
+                        pageName: 'pageNum', //页码的参数名称，默认：page
+                        limitName: 'limit' //每页数据量的参数名，默认：limit
+                    },
+                    response: {
+                        statusName: 'code', //数据状态的字段名称，默认：code
+                        statusCode: 200, //成功的状态码，默认：0
+                        msgName: 'msg', //状态信息的字段名称，默认：msg
+                        countName: 'count', //数据总数的字段名称，默认：count
+                        dataName: 'data' //数据列表的字段名称，默认：data
+                    },
+                    page: true, //开启分页
+                    cellMinWidth: 80,
+                    cols: [[
+                        { title: 'ID', fixed: 'left', sort: true, type: 'numbers' },
+                        { field: 'comment', title: '仓库名', sort: true },
+                        { field: 'site', title: '地点' },
+                    ]]
+                });
+
+            }
+        });
+        form.on('submit(queryScheduling)', function () {
+            $.ajax({
+                type: "get",
+                url: nginx_url + "/goodsInfo/querySchedule",
+                data: {
+                    'beginMarker': $('#beginMarker').val(),
+                    'passMarker': $('#passMarker').val()
+                },
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (result.STATUS ==="SUCCESS") {
+                        layer.confirm(result.data, {
+                            btn : [ '确定收到', '取消' ]//按钮
+                        });
+                        //$("#resetForm1").click();
+                    } else {
+                        layer.msg('路线规划失败', {
+                            time: 800,
+                            icon: 2
+                        });
+                    }
+                }
+
+            });return false;
+        });
+
+
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>登录</title>
+    <link href="layui/css/layui.css" rel="stylesheet" type="text/css" />
+    <link href="css/login/default.css" rel="stylesheet" type="text/css" />
+	<!--必要样式-->
+    <link href="css/login/styles.css" rel="stylesheet" type="text/css" />
+    <link href="css/login/demo.css" rel="stylesheet" type="text/css" />
+    <link href="css/login/loaders.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+	<div class='login'>
+        <div class="layui-form-item">
+            <form class="layui-form" action="" id="loginForm">
+                <div class='login_fields'>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                    </div>
+                    <div class="layui-form-item">
+                        <div class='login_fields__user'>
+                            <div class='icon'>
+                                <img alt="" src='img/user_icon_copy.png'>
+                            </div>
+                            <div class="layui-col-md8">
+                                <input type="text" id="phone" name="phone" required lay-verify="" placeholder="请填写手机号" autocomplete="off">
+                            </div>
+                            <div class="layui-col-md4">
+                                <button type="button" id="getVdCode" name="getVdCode"  class="layui-btn layui-btn-fluid" >发送验证码</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class='login_fields__password'>
+                            <div class='icon'>
+                                <img alt="" src='img/lock_icon_copy.png'>
+                            </div>
+                            <div class="layui-input-inline">
+                               <!-- <label class="layui-form-label">验证码</label>-->
+                                <input type="text" id="vertifyCode" name="vertifyCode" required lay-verify="required" placeholder="请填写验证码" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                                <button class="layui-btn" lay-submit lay-filter="login">登录</button>
+                            <label>没有账号？<a href="register.html" id="loginRegister">点击注册</a></label>
+                        </div>
+                        </div>
+                    </div>
+            </form>
+                <div class='layui-form-item' align="center">
+                    <p>欢迎登录Link物流系统</p>
+                </div>
+                </div>
+        </div>
+	<script type="text/javascript" src="js/login/jquery.min.js"></script>
+	<script type="text/javascript" src="js/login/jquery-ui.min.js"></script>
+	<script type="text/javascript" src='js/login/stopExecutionOnTimeout.js?t=1'></script>
+    <script type="text/javascript" src="layui/layui.js"></script>
+    <script type="text/javascript" src="js/login/Particleground.js"></script>
+    <script type="text/javascript" src="js/login/Treatment.js"></script>
+    <script src="js/jquery/jquery.cookie.js"></script>
+    <script src="js/nginx.js"></script>
+    <script src="js/login/login.js?t={{time()}}"></script>
+	<script type="text/javascript">
+
+	    // 粒子背景特效
+	    $('body').particleground({
+	        dotColor: '#E8DFE8',
+	        lineColor: '#133b88'
+	    });
+
+	    $('input[type="text"]').focus(function () {
+	        $(this).prev().animate({ 'opacity': '1' }, 200);
+	    });
+	    $('input[type="text"],input[type="password"]').blur(function () {
+	        $(this).prev().animate({ 'opacity': '.5' }, 200);
+	    });
+	    $('input[name="loginId"], input[name="password"]').keyup(function () {
+	        let Len = $(this).val().length;
+	        if (!$(this).val() == '' && Len >= 5) {
+	            $(this).next().animate({
+	                'opacity': '1',
+	                'right': '30'
+	            }, 200);
+	        } else {
+	            $(this).next().animate({
+	                'opacity': '0',
+	                'right': '20'
+	            }, 200);
+	        }
+	    });
+        layui.use(['element', 'form', 'laydate', 'layer','layedit', 'table','jquery','util'], function(){
+            let element = layui.element,
+                form = layui.form,
+                laydate = layui.laydate,
+                layedit=layui.layedit,
+                layer = layui.layer,
+                $ = layui.jquery,
+                table = layui.table;
+            $(document).on('click','#getVdCode',function(){
+                var phone = $('#phone').val();
+                if (!phone.match(/^0?(13[0-9]|14[5-9]|15[012356789]|166|17[0-8]|18[0-9]|19[8-9])[0-9]{8}$/)) {
+                    alert('请填写正确的手机号码！');
+                } else {
+                    $.ajax({
+                        type: "get",
+                        url: nginx_url + '/sendCode',
+                        data: {
+                            phone: phone
+                        },
+                        dataType: "json",
+                        success: function(data) {
+                            if (data.STATUS === "SUCCESS") {
+                                alert('验证码已成功发送，请及时查收！');
+                                timefsyzm_old();
+                            } else {
+                                alert('获取验证码失败，请稍后重试！');
+                            }
+                        }
+                    });
+                }
+            })
+
+
+            //创建一个编辑器
+            var editIndex = layedit.build('LAY_demo_editor');
+            //自定义验证规则
+            form.verify({
+                title: function(value) {
+                    if(value.length < 5) {
+                        return '标题至少得5个字符啊';
+                    }
+                },
+                pwd: [
+                    /^(\w){6,20}$/, '只能输入6-20个字母、数字、下划线'
+                ],
+                emails: [
+                    /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/, '请输入正确的邮箱格式：<br>如：xxx@qq.com<br>xxx@163.com等格式'
+                ],
+                phones: [
+                    /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/, '您的输入有误，请重新输入(中国11位手机号)'
+                ],
+                truename: [
+                    /^[\u4e00-\u9fa5]{2,4}$/, '您的输入有误，请输入2-4位中文'
+                ],
+                cardId: [
+                    /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, '请输入正确的身份证号'
+                ],
+                content: function(value) {
+                    layedit.sync(editIndex);
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+let nginx_url = "http://localhost:9998";

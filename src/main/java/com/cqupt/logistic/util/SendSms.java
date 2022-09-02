@@ -15,8 +15,8 @@ import com.aliyuncs.profile.DefaultProfile;
  */
 public class SendSms {
     public static boolean sendSms(String phone,String code) {
-        String accessKey="LTAI4G7GzAe5SNQC6GK6FTxa";
-        String accessSecret="SWO1qDZe1NxdJAdpjvPrgWIy7O17eO";
+        String accessKey="xxxxxxxx";
+        String accessSecret="xxxxxxxx";
         DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKey, accessSecret);
         IAcsClient client = new DefaultAcsClient(profile);
 
